@@ -17,6 +17,20 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build app
+        run: pnpm run build
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 

@@ -45,7 +45,9 @@ export interface RSSHubItem {
 export interface UserInfo {
   id: string
   email: string
-  type: "github"
+  username?: string
+  password_hash?: string
+  type: "github" | "local"
   data: string
   created: number
   updated: number

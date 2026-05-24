@@ -1,7 +1,7 @@
 {
   "name": "newsnow",
   "type": "module",
-  "version": "0.0.39",
+  "version": "0.0.40",
   "private": true,
   "packageManager": "pnpm@10.30.3",
   "author": {
@@ -11,7 +11,7 @@
   },
   "homepage": "https://github.com/ourongxing/newsnow",
   "scripts": {
-    "dev": "npm run presource && vite dev",
+    "dev": "npm run presource && node ./node_modules/.pnpm/nitro-go@0.0.3_@libsql+client@0.15.4_better-sqlite3@12.6.2_mysql2@3.14.3/node_modules/nitro-go/dist/cli/index.mjs dev .",
     "build": "npm run presource && vite build",
     "lint": "eslint",
     "presource": "tsx ./scripts/favicon.ts && tsx ./scripts/source.ts",

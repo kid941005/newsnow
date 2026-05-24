@@ -11,7 +11,8 @@ English | [简体中文](README.zh-CN.md) | [日本語](README.ja-JP.md)
 
 - Clean and elegant UI design for optimal reading experience
 - Real-time updates on trending news
-- GitHub OAuth login with data synchronization
+- Local account login and personal configuration
+- Keyword / blocked-keyword / push configuration support
 - 30-minute default cache duration (logged-in users can force refresh)
 - Adaptive scraping interval (minimum 2 minutes) based on source update frequency to optimize resource usage and prevent IP bans
 - support MCP server
@@ -60,11 +61,7 @@ For deployments without login and caching:
 Refer to `example.env.server`. For local development, rename it to `.env.server` and configure:
 
 ```env
-# Github Client ID
-G_CLIENT_ID=
-# Github Client Secret
-G_CLIENT_SECRET=
-# JWT Secret, usually the same as Client Secret
+# JWT Secret for local account login
 JWT_SECRET=
 # Initialize database, must be set to true on first run, can be turned off afterward
 INIT_TABLE=true
@@ -87,10 +84,10 @@ Supported database connectors: https://db0.unjs.io/connectors
 In project root directory:
 
 ```sh
-docker compose up
+docker compose -f docker-compose.local.yml up --build
 ```
 
-You can also set Environment Variables in `docker-compose.yml`.
+Set `JWT_SECRET` before starting the local container if you want to use local account login.
 
 ## Development
 
@@ -110,6 +107,13 @@ Refer to `shared/sources` and `server/sources` directories. The project provides
 For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Roadmap
+
+### Release Notes
+
+#### v0.0.40 (2026-05-24)
+- Removed GitHub OAuth login entry and backend callback route
+- Added local account registration/login, personal config, and push config APIs
+- Updated Docker local runtime so the local account flow works in container validation
 
 - Add **multi-language support** (English, Chinese, more to come).
 - Improve **personalization options** (category-based news, saved preferences).

@@ -112,6 +112,18 @@ For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTR
 
 ### Release Notes
 
+#### v0.0.48 (2026-05-25)
+- Fixed illegal `const import` declaration in generated ambient declarations
+- Fixed `useRef<Timer>()` initial value and missing React imports in toast component
+- Fixed unused variable warning in menu component
+- Fixed `authHeader()` return type mismatch in useUserConfig
+- Added explicit type imports in shared/sources.ts
+- Unified settings panel input/textarea/select/button styles to consistent rounded-xl, h-11, and spacing
+- Added sticky header with bottom border to the settings panel for visual hierarchy
+- Added border-top separator between form content and action buttons
+- Standardized checkbox toggle rows as bordered card-style items with right-aligned controls
+- Added glass-like outer panel border, backdrop-blur, and softer shadow
+
 #### v0.0.47 (2026-05-25)
 - Fixed the settings panel so scrolling stays inside the inner content wrapper instead of breaking the dialog shell
 - Tightened the modal header spacing and added a thin low-contrast scrollbar style scoped only to the settings panel

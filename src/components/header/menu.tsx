@@ -80,47 +80,47 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/30 p-4" onClick={onClose}>
-      <div className="max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-hidden rounded-xl bg-base shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="max-h-[calc(100vh-2rem)] overflow-y-auto px-4 pb-4 pt-3 settings-panel-scroll">
-          <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-lg font-semibold">账号与推送配置</h3>
-          <button type="button" className="btn i-ph:x" onClick={onClose} />
-        </div>
-        {loading
+      <div className="w-full max-w-lg rounded-2xl border border-white/35 bg-base/95 shadow-[0_24px_80px_rgba(15,23,42,0.18)] backdrop-blur-xl" onClick={e => e.stopPropagation()}>
+        <div className="settings-panel-scroll max-h-[calc(100vh-2rem)] overflow-y-auto px-4 pb-4 pt-3">
+          <div className="sticky top-0 z-10 mb-3 flex items-center justify-between border-b border-gray/15 bg-base px-0 pb-3 pt-1">
+            <h3 className="text-lg font-semibold">账号与推送配置</h3>
+            <button type="button" className="btn i-ph:x" onClick={onClose} />
+          </div>
+          {loading
           ? <div className="py-8 text-center text-sm opacity-70">加载中...</div>
           : (
-              <div className="space-y-3 text-sm">
+              <div className="space-y-4 px-1 pb-1 text-sm">
                 <label className="block space-y-1">
                   <span>关键词（逗号分隔）</span>
-                  <textarea className="w-full rounded-lg border border-gray/20 bg-white/70 p-2 outline-none dark:bg-black/10" rows={2} value={form.keywords.join(", ")} onChange={e => update("keywords", e.target.value.split(",").map(x => x.trim()).filter(Boolean))} />
+                  <textarea className="min-h-[88px] w-full rounded-xl border border-gray/20 bg-white/70 px-3 py-2.5 outline-none dark:bg-black/10" rows={2} value={form.keywords.join(", ")} onChange={e => update("keywords", e.target.value.split(",").map(x => x.trim()).filter(Boolean))} />
                 </label>
                 <label className="block space-y-1">
                   <span>屏蔽词（逗号分隔）</span>
-                  <textarea className="w-full rounded-lg border border-gray/20 bg-white/70 p-2 outline-none dark:bg-black/10" rows={2} value={form.blocked_keywords.join(", ")} onChange={e => update("blocked_keywords", e.target.value.split(",").map(x => x.trim()).filter(Boolean))} />
+                  <textarea className="min-h-[88px] w-full rounded-xl border border-gray/20 bg-white/70 px-3 py-2.5 outline-none dark:bg-black/10" rows={2} value={form.blocked_keywords.join(", ")} onChange={e => update("blocked_keywords", e.target.value.split(",").map(x => x.trim()).filter(Boolean))} />
                 </label>
                 <label className="block space-y-1">
                   <span>标签映射（JSON）</span>
-                  <textarea className="w-full rounded-lg border border-gray/20 bg-white/70 p-2 font-mono outline-none dark:bg-black/10" rows={3} value={JSON.stringify(form.keyword_tags)} onChange={e => {
+                  <textarea className="min-h-[112px] w-full rounded-xl border border-gray/20 bg-white/70 px-3 py-2.5 font-mono outline-none dark:bg-black/10" rows={3} value={JSON.stringify(form.keyword_tags)} onChange={e => {
                     try {
                       update("keyword_tags", e.target.value ? JSON.parse(e.target.value) : {})
                     } catch {}
                   }} />
                 </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={form.fetch_use_proxy} onChange={e => update("fetch_use_proxy", e.target.checked)} />
-                  <span>手动刷新时通过代理抓取新闻源</span>
+                <label className="flex items-center justify-between gap-3 rounded-xl border border-gray/15 bg-white/45 px-3 py-2.5 dark:bg-black/10">
+                  <span className="text-sm">手动刷新时通过代理抓取新闻源</span>
+                  <input type="checkbox" className="h-4 w-4 accent-current" checked={form.fetch_use_proxy} onChange={e => update("fetch_use_proxy", e.target.checked)} />
                 </label>
                 <label className="block space-y-1">
                   <span>代理地址</span>
-                  <input className="w-full rounded-lg border border-gray/20 bg-white/70 p-2 outline-none disabled:opacity-60 dark:bg-black/10" value={form.fetch_proxy_url} onChange={e => update("fetch_proxy_url", e.target.value)} placeholder="http://127.0.0.1:7890" disabled={!form.fetch_use_proxy} />
+                  <input className="h-11 w-full rounded-xl border border-gray/20 bg-white/70 px-3 outline-none disabled:opacity-60 dark:bg-black/10" value={form.fetch_proxy_url} onChange={e => update("fetch_proxy_url", e.target.value)} placeholder="http://127.0.0.1:7890" disabled={!form.fetch_use_proxy} />
                 </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={form.push_enabled} onChange={e => update("push_enabled", e.target.checked)} />
-                  <span>启用推送</span>
+                <label className="flex items-center justify-between gap-3 rounded-xl border border-gray/15 bg-white/45 px-3 py-2.5 dark:bg-black/10">
+                  <span className="text-sm">启用推送</span>
+                  <input type="checkbox" className="h-4 w-4 accent-current" checked={form.push_enabled} onChange={e => update("push_enabled", e.target.checked)} />
                 </label>
                 <label className="block space-y-1">
                   <span>推送渠道</span>
-                  <select className="w-full rounded-lg border border-gray/20 bg-white/70 p-2 outline-none dark:bg-black/10" value={form.push_channel} onChange={e => update("push_channel", e.target.value)}>
+                  <select className="h-11 w-full rounded-xl border border-gray/20 bg-white/70 px-3 outline-none dark:bg-black/10" value={form.push_channel} onChange={e => update("push_channel", e.target.value)}>
                     <option value="feishu">Feishu</option>
                     <option value="dingtalk">Dingtalk</option>
                     <option value="bark">Bark</option>
@@ -128,15 +128,15 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
                 </label>
                 <label className="block space-y-1">
                   <span>Webhook</span>
-                  <input className="w-full rounded-lg border border-gray/20 bg-white/70 p-2 outline-none dark:bg-black/10" value={form.push_webhook} onChange={e => update("push_webhook", e.target.value)} />
+                  <input className="h-11 w-full rounded-xl border border-gray/20 bg-white/70 px-3 outline-none dark:bg-black/10" value={form.push_webhook} onChange={e => update("push_webhook", e.target.value)} />
                 </label>
                 <label className="block space-y-1">
                   <span>推送 Cron</span>
-                  <input className="w-full rounded-lg border border-gray/20 bg-white/70 p-2 outline-none dark:bg-black/10" value={form.push_cron} onChange={e => update("push_cron", e.target.value)} />
+                  <input className="h-11 w-full rounded-xl border border-gray/20 bg-white/70 px-3 outline-none dark:bg-black/10" value={form.push_cron} onChange={e => update("push_cron", e.target.value)} />
                 </label>
-                <div className="flex flex-wrap gap-2 pt-2">
-                  <button type="button" className="rounded-lg bg-primary px-3 py-2 text-white disabled:opacity-60" disabled={saving} onClick={save}>{saving ? "保存中..." : "保存配置"}</button>
-                  <button type="button" className="rounded-lg border border-gray/20 px-3 py-2" onClick={push}>立即推送</button>
+                <div className="mt-1 flex flex-wrap gap-3 border-t border-gray/15 pt-4">
+                  <button type="button" className="h-11 rounded-xl bg-primary px-4 text-white disabled:opacity-60" disabled={saving} onClick={save}>{saving ? "保存中..." : "保存配置"}</button>
+                  <button type="button" className="h-11 rounded-xl border border-gray/20 px-4" onClick={push}>立即推送</button>
                 </div>
               </div>
             )}
@@ -147,7 +147,7 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
 }
 
 export function Menu() {
-  const { loggedIn, login, logout, loginLocal, registerLocal, userInfo, enableLogin } = useLogin()
+  const { loggedIn, logout, loginLocal, registerLocal, userInfo, enableLogin } = useLogin()
   const [shown, show] = useState(false)
   const [showConfig, setShowConfig] = useState(false)
   return (

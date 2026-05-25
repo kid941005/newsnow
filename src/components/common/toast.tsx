@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useMount, useWindowSize } from "react-use"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import type { ToastItem } from "~/atoms/types"
@@ -45,7 +45,7 @@ function Item({ info }: { info: ToastItem }) {
       info.onDismiss?.()
     }
   }, [info, setToastItems])
-  const timer = useRef<Timer>()
+  const timer = useRef<Timer | undefined>(undefined)
 
   useMount(() => {
     timer.current = new Timer(() => {

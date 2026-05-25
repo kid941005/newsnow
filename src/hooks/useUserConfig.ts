@@ -23,7 +23,7 @@ const defaultConfig: UserPushConfig = {
   fetch_proxy_url: "",
 }
 
-function authHeader() {
+function authHeader(): Record<string, string> {
   const jwt = safeParseString(localStorage.getItem("jwt"))
   return jwt ? { Authorization: `Bearer ${jwt}` } : {}
 }

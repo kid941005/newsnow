@@ -9,9 +9,9 @@ services:
     ports:
       - '4444:4444'
     volumes:
-      - newsnow_data:/usr/app/.data
+      - ./newsnow_data:/usr/app/.data
     environment:
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=your-secret
       - INIT_TABLE=true
       - ENABLE_CACHE=true
 

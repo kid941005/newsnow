@@ -110,6 +110,11 @@ For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTR
 
 ### Release Notes
 
+#### v0.0.43 (2026-05-25)
+- Simplified deployment config around a single primary `docker-compose.yml` workflow
+- Hardcoded `JWT_SECRET` in compose as chosen, removing extra environment-variable setup friction
+- Kept image-based main compose and local build compose aligned for the same runtime settings
+
 #### v0.0.42 (2026-05-25)
 - Added a new 关键词 tab to show keyword-filtered news and hide empty source cards
 - Updated docker compose files to use `kid941005/newsnow:main` and remove obsolete GitHub OAuth env vars

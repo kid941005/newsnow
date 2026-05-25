@@ -1,16 +1,16 @@
 services:
   newsnow:
-    image: kid941005/newsnow:main
+    image: kid941005/newsnow:latest
     container_name: newsnow
     ports:
       - '4444:4444'
     volumes:
-      - newsnow_data:/usr/app/.data
+      - ./newsnow_data:/usr/app/.data
     environment:
       - HOST=0.0.0.0
       - PORT=4444
       - NODE_ENV=production
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=your-secret
       - INIT_TABLE=true
       - ENABLE_CACHE=true
       - PRODUCTHUNT_API_TOKEN=

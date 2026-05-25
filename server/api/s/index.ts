@@ -1,7 +1,9 @@
 import type { SourceID, SourceResponse } from "@shared/types"
 import { getters } from "#/getters"
 import { getCacheTable } from "#/database/cache"
+import { UserTable } from "#/database/user"
 import type { CacheInfo } from "#/types"
+import { withFetchProxyContext } from "#/utils/fetch"
 
 export default defineEventHandler(async (event): Promise<SourceResponse> => {
   try {
@@ -55,8 +57,23 @@ export default defineEventHandler(async (event): Promise<SourceResponse> => {
       }
     }
 
+    const runGetter = async () => (await getters[id]()).slice(0, 30)
+
     try {
-      const newData = (await getters[id]()).slice(0, 30)
+      let newData
+      if (latest && event.context.user?.id) {
+        const db = useDatabase()
+        if (!db) throw new Error("db is not defined")
+        const userTable = new UserTable(db)
+        if (process.env.INIT_TABLE !== "false") await userTable.init()
+        const config = await userTable.getConfig(event.context.user.id)
+        newData = await withFetchProxyContext({
+          useProxy: config.fetch_use_proxy,
+          proxyUrl: config.fetch_proxy_url,
+        }, runGetter)
+      } else {
+        newData = await runGetter()
+      }
       if (cacheTable && newData.length) {
         if (event.context.waitUntil) event.context.waitUntil(cacheTable.set(id, newData))
         else await cacheTable.set(id, newData)

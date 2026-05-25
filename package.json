@@ -1,7 +1,7 @@
 {
   "name": "newsnow",
   "type": "module",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "private": true,
   "packageManager": "pnpm@10.30.3",
   "author": {
@@ -59,6 +59,7 @@
     "react-dom": "^19.0.4",
     "react-use": "^17.6.0",
     "uncrypto": "^0.1.3",
+    "undici": "^7.22.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

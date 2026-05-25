@@ -6,6 +6,8 @@ export interface UserPushConfig {
   push_channel: string
   push_webhook: string
   push_cron: string
+  fetch_use_proxy: boolean
+  fetch_proxy_url: string
   updated?: number
 }
 
@@ -17,6 +19,8 @@ const defaultConfig: UserPushConfig = {
   push_channel: "feishu",
   push_webhook: "",
   push_cron: "0 */4 * * *",
+  fetch_use_proxy: false,
+  fetch_proxy_url: "",
 }
 
 function authHeader() {

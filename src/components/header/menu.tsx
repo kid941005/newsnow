@@ -80,7 +80,7 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/30 p-4" onClick={onClose}>
-      <div className="w-full max-w-lg rounded-xl bg-base p-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+      <div className="max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl bg-base p-4 shadow-2xl" onClick={e => e.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-lg font-semibold">账号与推送配置</h3>
           <button type="button" className="btn i-ph:x" onClick={onClose} />
@@ -104,6 +104,14 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
                       update("keyword_tags", e.target.value ? JSON.parse(e.target.value) : {})
                     } catch {}
                   }} />
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={form.fetch_use_proxy} onChange={e => update("fetch_use_proxy", e.target.checked)} />
+                  <span>手动刷新时通过代理抓取新闻源</span>
+                </label>
+                <label className="block space-y-1">
+                  <span>代理地址</span>
+                  <input className="w-full rounded-lg border border-gray/20 bg-white/70 p-2 outline-none disabled:opacity-60 dark:bg-black/10" value={form.fetch_proxy_url} onChange={e => update("fetch_proxy_url", e.target.value)} placeholder="http://127.0.0.1:7890" disabled={!form.fetch_use_proxy} />
                 </label>
                 <label className="flex items-center gap-2">
                   <input type="checkbox" checked={form.push_enabled} onChange={e => update("push_enabled", e.target.checked)} />

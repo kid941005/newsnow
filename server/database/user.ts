@@ -2,6 +2,12 @@ import type { Database } from "db0"
 import type { UserInfo } from "#/types"
 import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto"
 
+async function ensureColumn(db: Database, table: string, column: string, definition: string) {
+  const rows = await db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name?: string }>
+  if (rows.some(row => row.name === column)) return
+  await db.prepare(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`).run()
+}
+
 export interface LocalRegisterInput {
   username: string
   password: string
@@ -15,6 +21,8 @@ export interface UserConfigData {
   push_channel: string
   push_webhook: string
   push_cron: string
+  fetch_use_proxy: boolean
+  fetch_proxy_url: string
 }
 
 export interface UserConfigRow {
@@ -26,6 +34,8 @@ export interface UserConfigRow {
   push_channel: string
   push_webhook: string
   push_cron: string
+  fetch_use_proxy: number
+  fetch_proxy_url: string
   updated: number
 }
 
@@ -37,6 +47,8 @@ const DEFAULT_CONFIG: UserConfigData = {
   push_channel: "feishu",
   push_webhook: "",
   push_cron: "0 */4 * * *",
+  fetch_use_proxy: false,
+  fetch_proxy_url: "",
 }
 
 function hashPassword(password: string) {
@@ -98,9 +110,13 @@ export class UserTable {
         push_channel TEXT,
         push_webhook TEXT,
         push_cron TEXT,
+        fetch_use_proxy INTEGER,
+        fetch_proxy_url TEXT,
         updated INTEGER
       );
     `).run()
+    await ensureColumn(this.db, "user_config", "fetch_use_proxy", "INTEGER DEFAULT 0")
+    await ensureColumn(this.db, "user_config", "fetch_proxy_url", "TEXT DEFAULT ''")
     logger.success(`init user table`)
   }
 
@@ -170,7 +186,7 @@ export class UserTable {
     const existed = await this.db.prepare(`SELECT user_id FROM user_config WHERE user_id = ?`).get(userId)
     if (existed) return
     const now = Date.now()
-    await this.db.prepare(`INSERT INTO user_config (user_id, keywords, blocked_keywords, keyword_tags, push_enabled, push_channel, push_webhook, push_cron, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    await this.db.prepare(`INSERT INTO user_config (user_id, keywords, blocked_keywords, keyword_tags, push_enabled, push_channel, push_webhook, push_cron, fetch_use_proxy, fetch_proxy_url, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .run(
         userId,
         JSON.stringify(DEFAULT_CONFIG.keywords),
@@ -180,13 +196,15 @@ export class UserTable {
         DEFAULT_CONFIG.push_channel,
         DEFAULT_CONFIG.push_webhook,
         DEFAULT_CONFIG.push_cron,
+        0,
+        DEFAULT_CONFIG.fetch_proxy_url,
         now,
       )
   }
 
   async getConfig(userId: string): Promise<UserConfigData & { updated: number }> {
     await this.ensureUserConfig(userId)
-    const row = await this.db.prepare(`SELECT user_id, keywords, blocked_keywords, keyword_tags, push_enabled, push_channel, push_webhook, push_cron, updated FROM user_config WHERE user_id = ?`).get(userId) as UserConfigRow
+    const row = await this.db.prepare(`SELECT user_id, keywords, blocked_keywords, keyword_tags, push_enabled, push_channel, push_webhook, push_cron, fetch_use_proxy, fetch_proxy_url, updated FROM user_config WHERE user_id = ?`).get(userId) as UserConfigRow
     if (!row) throw new Error(`user config ${userId} not found`)
     return {
       keywords: safeJsonParse(row.keywords, []),
@@ -196,6 +214,8 @@ export class UserTable {
       push_channel: row.push_channel || DEFAULT_CONFIG.push_channel,
       push_webhook: row.push_webhook || "",
       push_cron: row.push_cron || DEFAULT_CONFIG.push_cron,
+      fetch_use_proxy: Boolean(row.fetch_use_proxy),
+      fetch_proxy_url: row.fetch_proxy_url || "",
       updated: row.updated || Date.now(),
     }
   }
@@ -210,9 +230,11 @@ export class UserTable {
       push_channel: config.push_channel ?? current.push_channel,
       push_webhook: config.push_webhook ?? current.push_webhook,
       push_cron: config.push_cron ?? current.push_cron,
+      fetch_use_proxy: config.fetch_use_proxy ?? current.fetch_use_proxy,
+      fetch_proxy_url: config.fetch_proxy_url ?? current.fetch_proxy_url,
     }
     const updated = Date.now()
-    const state = await this.db.prepare(`UPDATE user_config SET keywords = ?, blocked_keywords = ?, keyword_tags = ?, push_enabled = ?, push_channel = ?, push_webhook = ?, push_cron = ?, updated = ? WHERE user_id = ?`)
+    const state = await this.db.prepare(`UPDATE user_config SET keywords = ?, blocked_keywords = ?, keyword_tags = ?, push_enabled = ?, push_channel = ?, push_webhook = ?, push_cron = ?, fetch_use_proxy = ?, fetch_proxy_url = ?, updated = ? WHERE user_id = ?`)
       .run(
         JSON.stringify(next.keywords),
         JSON.stringify(next.blocked_keywords),
@@ -221,6 +243,8 @@ export class UserTable {
         next.push_channel,
         next.push_webhook,
         next.push_cron,
+        next.fetch_use_proxy ? 1 : 0,
+        next.fetch_proxy_url,
         updated,
         userId,
       )

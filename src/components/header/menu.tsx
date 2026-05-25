@@ -80,8 +80,9 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/30 p-4" onClick={onClose}>
-      <div className="max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl bg-base p-4 shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="mb-3 flex items-center justify-between">
+      <div className="max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-hidden rounded-xl bg-base shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="max-h-[calc(100vh-2rem)] overflow-y-auto px-4 pb-4 pt-3 settings-panel-scroll">
+          <div className="mb-2 flex items-center justify-between">
           <h3 className="text-lg font-semibold">账号与推送配置</h3>
           <button type="button" className="btn i-ph:x" onClick={onClose} />
         </div>
@@ -139,6 +140,7 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
             )}
+        </div>
       </div>
     </div>
   )

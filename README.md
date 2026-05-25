@@ -112,6 +112,10 @@ For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTR
 
 ### Release Notes
 
+#### v0.0.47 (2026-05-25)
+- Fixed the settings panel so scrolling stays inside the inner content wrapper instead of breaking the dialog shell
+- Tightened the modal header spacing and added a thin low-contrast scrollbar style scoped only to the settings panel
+
 #### v0.0.46 (2026-05-25)
 - Added user-configurable proxy settings for manual `latest` refreshes only, without affecting normal cached reads or scheduled fetches
 - Wired proxy config through local account settings, server-side fetch context, and real-proxy validation against GitHub Trending

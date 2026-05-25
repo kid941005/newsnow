@@ -35,6 +35,28 @@ button:disabled {
   border-radius: 8px;
 }
 
+.settings-panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 132, 155, 0.38) transparent;
+}
+
+.settings-panel-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.settings-panel-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.settings-panel-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(120, 132, 155, 0.38);
+}
+
+.settings-panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 132, 155, 0.52);
+}
+
 /* https://github.com/KingSora/OverlayScrollbars/blob/master/packages/overlayscrollbars/src/styles/themes.scss */
 .dark .os-theme-dark {
   --os-handle-bg: rgba(255, 255, 255, 0.44);

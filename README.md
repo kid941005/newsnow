@@ -84,8 +84,10 @@ Supported database connectors: https://db0.unjs.io/connectors
 In project root directory:
 
 ```sh
-docker compose -f docker-compose.local.yml up --build
+docker compose up -d
 ```
+
+The repository now keeps only the primary `docker-compose.yml`.
 
 Set `JWT_SECRET` before starting the local container if you want to use local account login.
 
@@ -110,8 +112,14 @@ For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTR
 
 ### Release Notes
 
+#### v0.0.45 (2026-05-25)
+- Fixed the keyword tab runtime error by restoring the missing `useQuery` import in `src/components/column/dnd.tsx`
+- Removed `docker-compose.local.yml` and kept deployment centered on the single primary `docker-compose.yml`
+- Dropped unused compose environment entries (`NODE_ENV`, empty `PRODUCTHUNT_API_TOKEN`) while keeping the required runtime settings
+
 #### v0.0.44 (2026-05-25)
-- Removed unused top-level named volume declarations from both compose files after switching to bind mounts
+- Removed unused top-level named volume declarations from the primary compose file after switching to bind mounts
+- Simplified the repo to keep only the primary `docker-compose.yml`
 - Kept the deployment compose config minimal and consistent with the current `./newsnow_data` mount strategy
 
 #### v0.0.43 (2026-05-25)

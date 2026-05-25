@@ -9,8 +9,6 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=4444
-      - NODE_ENV=production
       - JWT_SECRET=your-secret
       - INIT_TABLE=true
       - ENABLE_CACHE=true
-      - PRODUCTHUNT_API_TOKEN=

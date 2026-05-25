@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from "react"
+import { useQuery } from "@tanstack/react-query"
 import type { SourceID } from "@shared/types"
 import type { BaseEventPayload, ElementDragType } from "@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types"
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge"

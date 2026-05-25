@@ -112,6 +112,10 @@ For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTR
 
 ### Release Notes
 
+#### v0.0.49 (2026-05-25)
+- Fixed settings dialog top clipping caused by missing `overflow-hidden` on outer dialog shell, which rounded corners were incorrectly cutting off the top of the scroll container
+- Simplified dialog layout: removed unnecessary flex-column wrapper, kept inner scroll container with viewport-constrained max-height for reliable display
+
 #### v0.0.48 (2026-05-25)
 - Fixed illegal `const import` declaration in generated ambient declarations
 - Fixed `useRef<Timer>()` initial value and missing React imports in toast component

@@ -14,24 +14,49 @@ import { useSortable } from "../common/dnd/useSortable"
 import { OverlayScrollbar } from "../common/overlay-scrollbar"
 import type { ItemsProps } from "./card"
 import { CardWrapper } from "./card"
-import { currentSourcesAtom } from "~/atoms"
+import { currentColumnIDAtom, currentSourcesAtom } from "~/atoms"
+import { useUserConfig } from "~/hooks/useUserConfig"
 
 const AnimationDuration = 200
 const WIDTH = 350
 export function Dnd() {
   const [items, setItems] = useAtom(currentSourcesAtom)
+  const currentColumnID = useAtomValue(currentColumnIDAtom)
+  const { loadConfig, defaultConfig } = useUserConfig()
+  const { data: userConfig = defaultConfig } = useQuery({
+    queryKey: ["user-config"],
+    queryFn: loadConfig,
+    staleTime: 1000 * 60,
+    retry: false,
+  })
   const [parent] = useAutoAnimate({ duration: AnimationDuration })
   useEntireQuery(items)
+  const displayItems = useMemo(() => {
+    if (currentColumnID !== "keyword") return items
+    const keywords = userConfig.keywords ?? []
+    const blockedKeywords = userConfig.blocked_keywords ?? []
+    if (!keywords.length) return []
+    return items.filter((id) => {
+      const cached = cacheSources.get(id)
+      if (!cached?.items) return true
+      return cached.items.some((item) => {
+        const text = [item.title, item.extra?.hover, item.extra?.info].filter(Boolean).join(" ").toLowerCase()
+        const matched = keywords.some(keyword => text.includes(keyword.toLowerCase()))
+        const blocked = blockedKeywords.some(keyword => text.includes(keyword.toLowerCase()))
+        return matched && !blocked
+      })
+    })
+  }, [currentColumnID, items, userConfig.blocked_keywords, userConfig.keywords])
   const { width } = useWindowSize()
   const minWidth = useMemo(() => {
     // double padding = 32
     return Math.min(width - 32, WIDTH)
   }, [width])
 
-  if (!items.length) return null
+  if (!displayItems.length) return null
 
   return (
-    <DndWrapper items={items} setItems={setItems} isSingleColumn={isMobile}>
+    <DndWrapper items={displayItems} setItems={setItems} isSingleColumn={isMobile}>
       <OverlayScrollbar defer className="overflow-x-auto">
         <motion.ol
           className={isMobile
@@ -60,10 +85,10 @@ export function Dnd() {
             },
           }}
         >
-          {items.map((id, index) => (
+          {displayItems.map((id, index) => (
             <motion.li
               key={id}
-              className={$(isMobile && "flex-shrink-0", isMobile && index === items.length - 1 && "mr-2")}
+              className={$(isMobile && "flex-shrink-0", isMobile && index === displayItems.length - 1 && "mr-2")}
               style={isMobile ? { width: `${width - 16 > WIDTH ? WIDTH : width - 16}px` } : undefined}
               transition={{
                 type: "tween",

@@ -4,6 +4,8 @@ import { AnimatePresence, motion, useInView } from "framer-motion"
 import { useWindowSize } from "react-use"
 import { forwardRef, useImperativeHandle } from "react"
 import { OverlayScrollbar } from "../common/overlay-scrollbar"
+import { currentColumnIDAtom } from "~/atoms"
+import { useUserConfig } from "~/hooks/useUserConfig"
 import { safeParseString } from "~/utils"
 
 export interface ItemsProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -52,6 +54,14 @@ export const CardWrapper = forwardRef<HTMLElement, ItemsProps>(({ id, isDragging
 
 function NewsCard({ id, setHandleRef }: NewsCardProps) {
   const { refresh } = useRefetch()
+  const currentColumnID = useAtomValue(currentColumnIDAtom)
+  const { loadConfig, defaultConfig } = useUserConfig()
+  const { data: userConfig = defaultConfig } = useQuery({
+    queryKey: ["user-config"],
+    queryFn: loadConfig,
+    staleTime: 1000 * 60,
+    retry: false,
+  })
   const { data, isFetching, isError } = useQuery({
     queryKey: ["source", id],
     queryFn: async ({ queryKey }) => {
@@ -103,6 +113,21 @@ function NewsCard({ id, setHandleRef }: NewsCardProps) {
   })
 
   const { isFocused, toggleFocus } = useFocusWith(id)
+  const filteredItems = useMemo(() => {
+    const items = data?.items ?? []
+    if (currentColumnID !== "keyword") return items
+
+    const keywords = userConfig.keywords ?? []
+    const blockedKeywords = userConfig.blocked_keywords ?? []
+    if (!keywords.length) return []
+
+    return items.filter((item) => {
+      const text = [item.title, item.extra?.hover, item.extra?.info].filter(Boolean).join(" ").toLowerCase()
+      const matched = keywords.some(keyword => text.includes(keyword.toLowerCase()))
+      const blocked = blockedKeywords.some(keyword => text.includes(keyword.toLowerCase()))
+      return matched && !blocked
+    })
+  }, [currentColumnID, data?.items, userConfig.blocked_keywords, userConfig.keywords])
 
   return (
     <>
@@ -163,7 +188,7 @@ function NewsCard({ id, setHandleRef }: NewsCardProps) {
         defer
       >
         <div className={$("transition-opacity-500", isFetching && "op-20")}>
-          {!!data?.items?.length && (sources[id].type === "hottest" ? <NewsListHot items={data.items} /> : <NewsListTimeLine items={data.items} />)}
+          {!!filteredItems.length && (sources[id].type === "hottest" ? <NewsListHot items={filteredItems} /> : <NewsListTimeLine items={filteredItems} />)}
         </div>
       </OverlayScrollbar>
     </>

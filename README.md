@@ -110,6 +110,10 @@ For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTR
 
 ### Release Notes
 
+#### v0.0.42 (2026-05-25)
+- Added a new 关键词 tab to show keyword-filtered news and hide empty source cards
+- Updated docker compose files to use `kid941005/newsnow:main` and remove obsolete GitHub OAuth env vars
+
 #### v0.0.41 (2026-05-24)
 - Fixed theme persistence so a saved light mode no longer falls back to dark after page refresh
 

@@ -18,6 +18,9 @@ export const columns = {
   focus: {
     zh: "关注",
   },
+  keyword: {
+    zh: "关键词",
+  },
   realtime: {
     zh: "实时",
   },
@@ -26,7 +29,7 @@ export const columns = {
   },
 } as const
 
-export const fixedColumnIds = ["focus", "hottest", "realtime"] as const satisfies Partial<ColumnID>[]
+export const fixedColumnIds = ["focus", "keyword", "hottest", "realtime"] as const satisfies Partial<ColumnID>[]
 export const hiddenColumns = Object.keys(columns).filter(id => !fixedColumnIds.includes(id as any)) as HiddenColumnID[]
 
 export const metadata: Metadata = typeSafeObjectFromEntries(typeSafeObjectEntries(columns).map(([k, v]) => {
@@ -35,6 +38,11 @@ export const metadata: Metadata = typeSafeObjectFromEntries(typeSafeObjectEntrie
       return [k, {
         name: v.zh,
         sources: [] as SourceID[],
+      }]
+    case "keyword":
+      return [k, {
+        name: v.zh,
+        sources: typeSafeObjectEntries(sources).filter(([, v]) => !v.redirect).map(([k]) => k),
       }]
     case "hottest":
       return [k, {

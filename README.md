@@ -110,6 +110,10 @@ For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTR
 
 ### Release Notes
 
+#### v0.0.44 (2026-05-25)
+- Removed unused top-level named volume declarations from both compose files after switching to bind mounts
+- Kept the deployment compose config minimal and consistent with the current `./newsnow_data` mount strategy
+
 #### v0.0.43 (2026-05-25)
 - Simplified deployment config around a single primary `docker-compose.yml` workflow
 - Hardcoded `JWT_SECRET` in compose as chosen, removing extra environment-variable setup friction

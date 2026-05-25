@@ -14,7 +14,3 @@ services:
       - INIT_TABLE=true
       - ENABLE_CACHE=true
       - PRODUCTHUNT_API_TOKEN=
-
-volumes:
-  newsnow_data:
-    name: newsnow_data

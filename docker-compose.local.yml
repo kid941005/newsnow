@@ -14,7 +14,3 @@ services:
       - JWT_SECRET=your-secret
       - INIT_TABLE=true
       - ENABLE_CACHE=true
-
-volumes:
-  newsnow_data:
-    name: newsnow_data

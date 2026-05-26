@@ -6,7 +6,7 @@ export declare type ColorScheme = "dark" | "light" | "auto"
 const colorSchemeAtom = atomWithStorage<ColorScheme>("color-scheme", "auto")
 
 function syncThemeColor(isDark: boolean) {
-  const metaThemeColor = document.querySelector('meta[name="theme-color"]:not([media])')
+  const metaThemeColor = document.querySelector("meta[name=\"theme-color\"]:not([media])")
   if (metaThemeColor) {
     metaThemeColor.setAttribute("content", isDark ? "#111827" : "#F14D42")
   }

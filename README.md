@@ -112,6 +112,12 @@ For detailed instructions on how to add new sources, see [CONTRIBUTING.md](CONTR
 
 ### Release Notes
 
+#### v0.0.50 (2026-05-26)
+- Redesigned local auth dialog with unified login/register tabs, improved visual hierarchy, and segmented mode switch
+- Refined settings panel styling with grouped sections, inline status messages, and consistent rounded controls
+- Fixed theme initialization to follow system preference on first paint and keep browser `theme-color` synced with light/dark mode changes
+- Restored working ESLint config by removing incompatible shared React rule preset and cleaned lint errors in touched files
+
 #### v0.0.49 (2026-05-25)
 - Fixed settings dialog top clipping caused by missing `overflow-hidden` on outer dialog shell, which rounded corners were incorrectly cutting off the top of the scroll container
 - Simplified dialog layout: removed unnecessary flex-column wrapper, kept inner scroll container with viewport-constrained max-height for reliable display

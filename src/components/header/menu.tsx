@@ -22,7 +22,10 @@ function ThemeToggle() {
       </li>
       <li className="pointer-events-none text-xs opacity-70">
         <span className={$("inline-block", isDark ? "i-ph:moon-stars-duotone" : "i-ph:sun-dim-duotone")} />
-        <span>当前：{isDark ? "深色" : "浅色"}</span>
+        <span>
+          当前：
+          {isDark ? "深色" : "浅色"}
+        </span>
       </li>
     </>
   )
@@ -151,6 +154,7 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<UserPushConfig>(defaultConfig)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState<{ type: "success" | "error", text: string } | null>(null)
 
   useEffect(() => {
     loadConfig().then((config) => {
@@ -167,23 +171,25 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
 
   const save = async () => {
     setSaving(true)
+    setMessage(null)
     try {
       const config = await saveConfig(form)
       setForm(config)
-      window.alert("配置已保存")
+      setMessage({ type: "success", text: "配置已保存" })
     } catch (e: any) {
-      window.alert(e?.data?.message || e?.message || "保存失败")
+      setMessage({ type: "error", text: e?.data?.message || e?.message || "保存失败" })
     } finally {
       setSaving(false)
     }
   }
 
   const push = async () => {
+    setMessage(null)
     try {
       const res = await pushNow()
-      window.alert(`推送成功，共 ${res.count} 条`)
+      setMessage({ type: "success", text: `推送成功，共 ${res.count} 条` })
     } catch (e: any) {
-      window.alert(e?.data?.message || e?.message || "推送失败")
+      setMessage({ type: "error", text: e?.data?.message || e?.message || "推送失败" })
     }
   }
 
@@ -202,71 +208,88 @@ function ConfigPanel({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           {loading
-          ? <div className="py-8 text-center text-sm opacity-70">加载中...</div>
-          : (
-              <div className="space-y-5 px-1 pb-1 text-sm">
-                <div className="space-y-4 rounded-[28px] border border-gray/12 bg-black/3 p-3 dark:bg-white/4">
-                  <div className="px-1">
-                    <div className="text-xs font-medium uppercase tracking-[0.16em] opacity-50">内容筛选</div>
-                    <div className="mt-1 text-sm opacity-72">管理推送关键词、屏蔽词和标签映射。</div>
+            ? <div className="py-8 text-center text-sm opacity-70">加载中...</div>
+            : (
+                <div className="space-y-5 px-1 pb-1 text-sm">
+                  <div className="space-y-4 rounded-[28px] border border-gray/12 bg-black/3 p-3 dark:bg-white/4">
+                    <div className="px-1">
+                      <div className="text-xs font-medium uppercase tracking-[0.16em] opacity-50">内容筛选</div>
+                      <div className="mt-1 text-sm opacity-72">管理推送关键词、屏蔽词和标签映射。</div>
+                    </div>
+                    <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">关键词（逗号分隔）</span>
+                      <textarea className="min-h-[88px] w-full rounded-2xl border border-gray/18 bg-white/75 px-3 py-2.5 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" rows={2} value={form.keywords.join(", ")} onChange={e => update("keywords", e.target.value.split(",").map(x => x.trim()).filter(Boolean))} />
+                    </label>
+                    <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">屏蔽词（逗号分隔）</span>
+                      <textarea className="min-h-[88px] w-full rounded-2xl border border-gray/18 bg-white/75 px-3 py-2.5 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" rows={2} value={form.blocked_keywords.join(", ")} onChange={e => update("blocked_keywords", e.target.value.split(",").map(x => x.trim()).filter(Boolean))} />
+                    </label>
+                    <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">标签映射（JSON）</span>
+                      <textarea
+                        className="min-h-[112px] w-full rounded-2xl border border-gray/18 bg-white/75 px-3 py-2.5 font-mono outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12"
+                        rows={3}
+                        value={JSON.stringify(form.keyword_tags)}
+                        onChange={(e) => {
+                          try {
+                            update("keyword_tags", e.target.value ? JSON.parse(e.target.value) : {})
+                          } catch {}
+                        }}
+                      />
+                    </label>
                   </div>
-                  <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">关键词（逗号分隔）</span>
-                    <textarea className="min-h-[88px] w-full rounded-2xl border border-gray/18 bg-white/75 px-3 py-2.5 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" rows={2} value={form.keywords.join(", ")} onChange={e => update("keywords", e.target.value.split(",").map(x => x.trim()).filter(Boolean))} />
-                  </label>
-                  <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">屏蔽词（逗号分隔）</span>
-                    <textarea className="min-h-[88px] w-full rounded-2xl border border-gray/18 bg-white/75 px-3 py-2.5 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" rows={2} value={form.blocked_keywords.join(", ")} onChange={e => update("blocked_keywords", e.target.value.split(",").map(x => x.trim()).filter(Boolean))} />
-                  </label>
-                  <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">标签映射（JSON）</span>
-                    <textarea className="min-h-[112px] w-full rounded-2xl border border-gray/18 bg-white/75 px-3 py-2.5 font-mono outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" rows={3} value={JSON.stringify(form.keyword_tags)} onChange={e => {
-                      try {
-                        update("keyword_tags", e.target.value ? JSON.parse(e.target.value) : {})
-                      } catch {}
-                    }} />
-                  </label>
+                  <div className="space-y-4 rounded-[28px] border border-gray/12 bg-black/3 p-3 dark:bg-white/4">
+                    <div className="px-1">
+                      <div className="text-xs font-medium uppercase tracking-[0.16em] opacity-50">抓取与推送</div>
+                      <div className="mt-1 text-sm opacity-72">配置代理、渠道和推送计划。</div>
+                    </div>
+                    <label className="flex items-center justify-between gap-3 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">手动刷新时通过代理抓取新闻源</span>
+                      <input type="checkbox" className="h-4 w-4 accent-current" checked={form.fetch_use_proxy} onChange={e => update("fetch_use_proxy", e.target.checked)} />
+                    </label>
+                    <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">代理地址</span>
+                      <input className="h-11 w-full rounded-2xl border border-gray/18 bg-white/75 px-3 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white disabled:opacity-60 dark:bg-black/12" value={form.fetch_proxy_url} onChange={e => update("fetch_proxy_url", e.target.value)} placeholder="http://127.0.0.1:7890" disabled={!form.fetch_use_proxy} />
+                    </label>
+                    <label className="flex items-center justify-between gap-3 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">启用推送</span>
+                      <input type="checkbox" className="h-4 w-4 accent-current" checked={form.push_enabled} onChange={e => update("push_enabled", e.target.checked)} />
+                    </label>
+                    <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">推送渠道</span>
+                      <select className="h-11 w-full rounded-2xl border border-gray/18 bg-white/75 px-3 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" value={form.push_channel} onChange={e => update("push_channel", e.target.value)}>
+                        <option value="feishu">Feishu</option>
+                        <option value="dingtalk">Dingtalk</option>
+                        <option value="bark">Bark</option>
+                      </select>
+                    </label>
+                    <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">Webhook</span>
+                      <input className="h-11 w-full rounded-2xl border border-gray/18 bg-white/75 px-3 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" value={form.push_webhook} onChange={e => update("push_webhook", e.target.value)} />
+                    </label>
+                    <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
+                      <span className="text-sm font-medium opacity-80">推送 Cron</span>
+                      <input className="h-11 w-full rounded-2xl border border-gray/18 bg-white/75 px-3 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" value={form.push_cron} onChange={e => update("push_cron", e.target.value)} />
+                    </label>
+                    <div className="mt-2 flex flex-wrap gap-3 border-t border-gray/12 pt-4">
+                      <button type="button" className="h-11 rounded-2xl bg-primary px-4 text-white shadow-lg shadow-primary/20 disabled:opacity-60" disabled={saving} onClick={save}>{saving ? "保存中..." : "保存配置"}</button>
+                      <button type="button" className="h-11 rounded-2xl border border-gray/18 bg-white/55 px-4 transition-all duration-200 hover:bg-white/80 dark:bg-black/8" onClick={push}>立即推送</button>
+                    </div>
+                    {message && (
+                      <div
+                        className={$(
+                          "rounded-2xl border px-4 py-3 text-sm",
+                          message.type === "success"
+                            ? "border-green/15 bg-green/8 text-green-6"
+                            : "border-red/15 bg-red/8 text-red-5",
+                        )}
+                      >
+                        {message.text}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-4 rounded-[28px] border border-gray/12 bg-black/3 p-3 dark:bg-white/4">
-                  <div className="px-1">
-                    <div className="text-xs font-medium uppercase tracking-[0.16em] opacity-50">抓取与推送</div>
-                    <div className="mt-1 text-sm opacity-72">配置代理、渠道和推送计划。</div>
-                  </div>
-                  <label className="flex items-center justify-between gap-3 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">手动刷新时通过代理抓取新闻源</span>
-                    <input type="checkbox" className="h-4 w-4 accent-current" checked={form.fetch_use_proxy} onChange={e => update("fetch_use_proxy", e.target.checked)} />
-                  </label>
-                  <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">代理地址</span>
-                    <input className="h-11 w-full rounded-2xl border border-gray/18 bg-white/75 px-3 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white disabled:opacity-60 dark:bg-black/12" value={form.fetch_proxy_url} onChange={e => update("fetch_proxy_url", e.target.value)} placeholder="http://127.0.0.1:7890" disabled={!form.fetch_use_proxy} />
-                  </label>
-                  <label className="flex items-center justify-between gap-3 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">启用推送</span>
-                    <input type="checkbox" className="h-4 w-4 accent-current" checked={form.push_enabled} onChange={e => update("push_enabled", e.target.checked)} />
-                  </label>
-                  <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">推送渠道</span>
-                    <select className="h-11 w-full rounded-2xl border border-gray/18 bg-white/75 px-3 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" value={form.push_channel} onChange={e => update("push_channel", e.target.value)}>
-                      <option value="feishu">Feishu</option>
-                      <option value="dingtalk">Dingtalk</option>
-                      <option value="bark">Bark</option>
-                    </select>
-                  </label>
-                  <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">Webhook</span>
-                    <input className="h-11 w-full rounded-2xl border border-gray/18 bg-white/75 px-3 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" value={form.push_webhook} onChange={e => update("push_webhook", e.target.value)} />
-                  </label>
-                  <label className="block space-y-1.5 rounded-2xl border border-gray/12 bg-white/45 px-4 py-3 dark:bg-black/10">
-                    <span className="text-sm font-medium opacity-80">推送 Cron</span>
-                    <input className="h-11 w-full rounded-2xl border border-gray/18 bg-white/75 px-3 outline-none transition-all duration-200 focus:border-primary/45 focus:bg-white dark:bg-black/12" value={form.push_cron} onChange={e => update("push_cron", e.target.value)} />
-                  </label>
-                  <div className="mt-2 flex flex-wrap gap-3 border-t border-gray/12 pt-4">
-                    <button type="button" className="h-11 rounded-2xl bg-primary px-4 text-white shadow-lg shadow-primary/20 disabled:opacity-60" disabled={saving} onClick={save}>{saving ? "保存中..." : "保存配置"}</button>
-                    <button type="button" className="h-11 rounded-2xl border border-gray/18 bg-white/55 px-4 transition-all duration-200 hover:bg-white/80 dark:bg-black/8" onClick={push}>立即推送</button>
-                  </div>
-                </div>
-              </div>
-            )}
+              )}
         </div>
       </div>
     </div>

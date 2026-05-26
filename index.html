@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" class="dark">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8" />
@@ -25,6 +25,8 @@
   <meta name="twitter:image" content="https://newsnow.busiyi.world/og-image.svg" />
 
   <meta name="theme-color" content="#F14D42" />
+  <meta name="theme-color" content="#F14D42" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)" />
   <link rel="preload" href="/Baloo2-Bold.subset.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 
@@ -55,6 +57,15 @@
       localStorage.setItem("jwt", JSON.stringify(query.get("jwt")))
       window.history.replaceState({}, document.title, window.location.pathname)
     }
+
+    const colorScheme = localStorage.getItem("color-scheme")
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+    const isDark = colorScheme === "dark" || (colorScheme !== "light" && prefersDark)
+    document.documentElement.classList.toggle("dark", isDark)
+
+    const themeColor = isDark ? "#111827" : "#F14D42"
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]:not([media])')
+    if (metaThemeColor) metaThemeColor.setAttribute("content", themeColor)
   </script>
   <title>NewsNow</title>
 </head>
